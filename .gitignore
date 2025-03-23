@@ -396,3 +396,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/FLLVestSjaelland/FLLVestSjaelland/appsettings.Development.json
