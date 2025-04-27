@@ -1,0 +1,67 @@
+﻿@page "/OpretBruger"
+@rendermode InteractiveServer
+
+@using FLLVestSjaelland.Account
+@using System.ComponentModel.DataAnnotations
+@using System.Text
+@using System.Text.Encodings.Web
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.WebUtilities
+
+@inject UserManager<ApplicationUser> UserManager
+@inject IUserStore<ApplicationUser> UserStore
+@inject SignInManager<ApplicationUser> SignInManager
+@inject NavigationManager NavigationManager
+@inject IdentityRedirectManager RedirectManager
+
+
+
+<h3>CreateUser</h3>
+
+<InputText @bind-Value="Username" placeholder="Username" class="shadow-lg border border-1 border-black rounded" />
+
+<InputText @bind-Value="Password" type="password" placeholder="Password" class="shadow-lg border border-1 border-black rounded" />
+
+<button class="shadow-lg border border-1 border-black rounded hover:cursor-pointer" @onclick="RegisterUser">
+    Opret Bruger
+</button>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "ReturnUrl")]
+    public string? ReturnUrl { get; set; }
+
+    private string Username = "";
+    private string Password = "";
+
+
+
+    public async Task RegisterUser()
+    {
+        var user = CreateApplicationUser();
+
+        await UserStore.SetUserNameAsync(user, Username, CancellationToken.None);
+        var result = await UserManager.CreateAsync(user, Password);
+
+        if (!result.Succeeded)
+        {
+            return;
+        }
+
+        await SignInManager.SignInAsync(user, isPersistent: false);
+        RedirectManager.RedirectTo(ReturnUrl);
+    }
+
+    private ApplicationUser CreateApplicationUser()
+    {
+        try
+        {
+            return Activator.CreateInstance<ApplicationUser>();
+        }
+        catch
+        {
+            throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
+                $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
+        }
+    }
+}

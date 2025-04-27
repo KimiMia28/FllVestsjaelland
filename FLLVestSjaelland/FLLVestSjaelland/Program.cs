@@ -28,7 +28,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<DBContext>(options =>
     options.UseSqlite(connectionString));
 
-builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<DBContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
@@ -43,11 +43,11 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-//using (var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
-//{
-//    var context = serviceScope.ServiceProvider.GetService<DBContext>();
-//    context.Database.Migrate();
-//}
+using (var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+{
+    var context = serviceScope.ServiceProvider.GetService<DBContext>();
+    context.Database.Migrate();
+}
 
 app.UseHttpsRedirection();
 
