@@ -1,6 +1,32 @@
 ﻿@page "/Bruger/Oversigt"
-<h3>Bruger Oversigt</h3>
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using FLLVestSjaelland.Account
+@using Microsoft.AspNetCore.Identity;
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@rendermode InteractiveServer
+
+@attribute [Authorize]
+
+<h3 class="text-lg">Bruger Oversigt</h3>
+
+<p class=" bg-red-700 p-4 m-4 shadow-lg">
+    Hej @UserName
+</p>
+
 
 @code {
+    public string UserName { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
 
+        if (user.Identity.IsAuthenticated)
+        {
+            var applicationUser = await UserManager.FindByNameAsync(user.Identity.Name);
+            UserName = applicationUser.UserName ?? "Ukendt bruger";
+        }
+    }
 }
