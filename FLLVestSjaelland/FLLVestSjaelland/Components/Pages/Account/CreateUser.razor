@@ -1,5 +1,4 @@
 ﻿@page "/Account/OpretBruger"
-@rendermode InteractiveServer
 
 @using FLLVestSjaelland.Account
 @using System.ComponentModel.DataAnnotations
@@ -18,21 +17,35 @@
 
 <h3>CreateUser</h3>
 
-<InputText @bind-Value="Username" placeholder="Username" class="shadow-lg border border-1 border-black rounded" />
+<EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
+    <div class="form-floating mb-3">
+        <InputText @bind-Value="Input.Username" class="form-control" autocomplete="username" aria-required="true" placeholder="Username" />
+        <label for="email">Email</label>
+        <ValidationMessage For="() => Input.Username" class="text-danger" />
+    </div>
+    <div class="form-floating mb-3">
+        <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Password" />
+        <label for="password">Password</label>
+        <ValidationMessage For="() => Input.Password" class="text-danger" />
+    </div>
+    <button type="submit" class="w-100 btn btn-lg btn-primary">Opret</button>
+</EditForm>
 
-<InputText @bind-Value="Password" type="password" placeholder="Password" class="shadow-lg border border-1 border-black rounded" />
+@* <InputText @bind-Value="Username" placeholder="Username" class="shadow-lg border border-1 border-black rounded" /> *@
 
-<button class="shadow-lg border border-1 border-black rounded hover:cursor-pointer" @onclick="RegisterUser">
-    Opret Bruger
-</button>
+@* <InputText @bind-Value="Password" type="password" placeholder="Password" class="shadow-lg border border-1 border-black rounded" /> *@
+
+@* <button class="shadow-lg border border-1 border-black rounded hover:cursor-pointer" @onclick="RegisterUser"> *@
+@*     Opret Bruger *@
+@* </button> *@
 
 @code {
     [Parameter]
     [SupplyParameterFromQuery(Name = "ReturnUrl")]
     public string? ReturnUrl { get; set; }
 
-    private string Username = "";
-    private string Password = "";
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new();
 
 
 
@@ -40,8 +53,8 @@
     {
         var user = CreateApplicationUser();
 
-        await UserStore.SetUserNameAsync(user, Username, CancellationToken.None);
-        var result = await UserManager.CreateAsync(user, Password);
+        await UserStore.SetUserNameAsync(user, Input.Username, CancellationToken.None);
+        var result = await UserManager.CreateAsync(user, Input.Password);
 
         if (!result.Succeeded)
         {
@@ -63,5 +76,15 @@
             throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
                 $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
         }
+    }
+
+    private sealed class InputModel
+    {
+        [Required]
+        public string Username { get; set; } = "";
+
+        [Required]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = "";
     }
 }

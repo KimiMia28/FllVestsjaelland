@@ -63,7 +63,7 @@
 
     public async Task LoginUser()
     {
-        var result = await SignInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+        var result = await SignInManager.PasswordSignInAsync(Input.Username, Input.Password, false, lockoutOnFailure: false);
         if (result.Succeeded)
         {
             RedirectManager.RedirectTo(ReturnUrl);
@@ -78,8 +78,5 @@
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; } = "";
-
-        [Display(Name = "Remember me?")]
-        public bool RememberMe { get; set; }
     }
 }
