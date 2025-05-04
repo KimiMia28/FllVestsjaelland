@@ -1,9 +1,12 @@
-﻿@page "/Account/Login"
+﻿@* Stien ind til siden *@
+@page "/Account/Login"
 
+@* Imports *@
 @using System.ComponentModel.DataAnnotations
 @using FLLVestSjaelland.Account
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
+
 
 @inject SignInManager<ApplicationUser> SignInManager
 @* @inject ILogger<Login> Logger *@
@@ -19,7 +22,6 @@
             <StatusMessage Message="@errorMessage" />
             <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator />
-                <h2>Use a local account to log in.</h2>
                 <hr />
                 <ValidationSummary class="text-danger" role="alert" />
                 <div class="form-floating mb-3">
@@ -31,7 +33,7 @@
                     <ValidationMessage For="() => Input.Password" class="text-danger" />
                 </div>
                 <div>
-                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                    <button type="submit" class="btn btn-lg btn-primary w-100">Log in</button>
                 </div>
                 <a href="@(NavigationManager.GetUriWithQueryParameters("Account/OpretBruger", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
 
