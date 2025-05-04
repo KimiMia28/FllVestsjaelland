@@ -1,14 +1,22 @@
 ﻿@page "/Bruger/Oversigt"
+
+@* Imports *@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using FLLVestSjaelland.Account
 @using Microsoft.AspNetCore.Identity;
+
+@* Dependencies injections *@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<ApplicationUser> UserManager
+
+@* Sætter siden til at kunne snakke sammen med siden interaktivt *@
 @rendermode InteractiveServer
 
+@* Skal være logget ind for at tilgå siden *@
 @attribute [Authorize]
 
+@* Indhold på siden *@
 <h3 class="text-lg">Bruger Oversigt</h3>
 
 <p class=" bg-red-700 p-4 m-4 shadow-lg">
@@ -17,14 +25,20 @@
 
 
 @code {
+    // Variable
     public string UserName { get; set; }
+
+    // Metode fra Blazor som køres EN gang når man kommer ind på siden
     protected override async Task OnInitializedAsync()
     {
+        //Få fat i brugeren som der er logget ind
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
+        //Tjek om brugeren må have adgang til siden
         if (user.Identity.IsAuthenticated)
         {
+            //Find information om brugeren
             var applicationUser = await UserManager.FindByNameAsync(user.Identity.Name);
             UserName = applicationUser.UserName ?? "Ukendt bruger";
         }

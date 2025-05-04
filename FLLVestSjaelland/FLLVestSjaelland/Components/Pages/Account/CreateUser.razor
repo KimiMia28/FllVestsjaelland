@@ -1,5 +1,6 @@
 ﻿@page "/Account/OpretBruger"
 
+@* Imports *@
 @using FLLVestSjaelland.Account
 @using System.ComponentModel.DataAnnotations
 @using System.Text
@@ -7,6 +8,7 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 
+@* Dependencies injection *@
 @inject UserManager<ApplicationUser> UserManager
 @inject IUserStore<ApplicationUser> UserStore
 @inject SignInManager<ApplicationUser> SignInManager
@@ -16,7 +18,7 @@
 
 
 <h3>CreateUser</h3>
-
+@* Tjekker om alle intastede informationer er valide, når der trykkes "Opret" - en sej div *@
 <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
     <div class="form-floating mb-3">
         <InputText @bind-Value="Input.Username" class="form-control" autocomplete="username" aria-required="true" placeholder="Username" />
@@ -31,15 +33,9 @@
     <button type="submit" class="w-100 btn btn-lg btn-primary">Opret</button>
 </EditForm>
 
-@* <InputText @bind-Value="Username" placeholder="Username" class="shadow-lg border border-1 border-black rounded" /> *@
-
-@* <InputText @bind-Value="Password" type="password" placeholder="Password" class="shadow-lg border border-1 border-black rounded" /> *@
-
-@* <button class="shadow-lg border border-1 border-black rounded hover:cursor-pointer" @onclick="RegisterUser"> *@
-@*     Opret Bruger *@
-@* </button> *@
 
 @code {
+    //Variabler
     [Parameter]
     [SupplyParameterFromQuery(Name = "ReturnUrl")]
     public string? ReturnUrl { get; set; }
@@ -48,23 +44,32 @@
     private InputModel Input { get; set; } = new();
 
 
-
+    //Metoden der opretter brugeren
     public async Task RegisterUser()
     {
+        //Opretter in instands af en ApplicationUser (en bruger)
         var user = CreateApplicationUser();
 
+        //Vi giver brugeren et brugernavn
         await UserStore.SetUserNameAsync(user, Input.Username, CancellationToken.None);
+
+        //Brugeren oprettes i databasen
         var result = await UserManager.CreateAsync(user, Input.Password);
 
+        //Hvis dette ikke lykkes stoppes motoden
         if (!result.Succeeded)
         {
             return;
         }
 
+        //Brugen logges ind
         await SignInManager.SignInAsync(user, isPersistent: false);
+
+        //Der vendes tilbage til siden brugen logger ind på
         RedirectManager.RedirectTo(ReturnUrl);
     }
 
+    //Metoden til at lave en ApplicationUser
     private ApplicationUser CreateApplicationUser()
     {
         try
@@ -78,6 +83,7 @@
         }
     }
 
+    //Privat klasse til at håndtere input data
     private sealed class InputModel
     {
         [Required]

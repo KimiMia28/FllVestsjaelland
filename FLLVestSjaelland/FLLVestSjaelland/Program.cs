@@ -1,3 +1,4 @@
+//Imports
 using FLLVestSjaelland.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -6,9 +7,10 @@ using static System.Formats.Asn1.AsnWriter;
 using FLLVestSjaelland.Data;
 using Microsoft.EntityFrameworkCore;
 
+//Der instandseres en builder til at lave en webapplikation
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Tilføj services til builderen
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
@@ -24,31 +26,34 @@ builder.Services.AddAuthentication(options =>
 })
     .AddIdentityCookies();
 
+//Der hentes connectionstring til databasen og databasekonteksten tilføjes til services
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<DBContext>(options =>
     options.UseSqlite(connectionString));
+
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<DBContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
+//Webapplicationen bygges
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Konfigurer HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
+//Opdaterer databasen med den nyeste migration (de nyeste ændringer)
 using (var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
 {
     var context = serviceScope.ServiceProvider.GetService<DBContext>();
     context.Database.Migrate();
 }
 
+//Konfigurationer
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
@@ -56,4 +61,6 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+//Wepapplicationen startes
 app.Run();

@@ -8,41 +8,48 @@
 @using Microsoft.AspNetCore.Identity
 
 
+@* Dependencies injections *@
 @inject SignInManager<ApplicationUser> SignInManager
 @* @inject ILogger<Login> Logger *@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
+@* Tab title *@
 <PageTitle>Log in</PageTitle>
 
+
+@* Mere eller mindre bare blandet html *@
 <h1>Log in</h1>
 <div class="row">
     <div class="col-md-4">
         <section>
             <StatusMessage Message="@errorMessage" />
+            @* Tjekker om alle intastede informationer er valide, når der trykkes "log ind" - en sej div *@
             <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator />
                 <hr />
                 <ValidationSummary class="text-danger" role="alert" />
                 <div class="form-floating mb-3">
-                    <InputText @bind-Value="Input.Username" class="form-control" autocomplete="username" aria-required="true" placeholder="Username" />
+                    <InputText @bind-Value="Input.Username" autocomplete="username" aria-required="true" placeholder="Username" />
                     <ValidationMessage For="() => Input.Username" class="text-danger" />
                 </div>
                 <div class="form-floating mb-3">
-                    <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+                    <InputText type="password" @bind-Value="Input.Password" autocomplete="current-password" aria-required="true" placeholder="password" />
                     <ValidationMessage For="() => Input.Password" class="text-danger" />
                 </div>
                 <div>
                     <button type="submit" class="btn btn-lg btn-primary w-100">Log in</button>
                 </div>
+                @* Et link med parametre *@
                 <a href="@(NavigationManager.GetUriWithQueryParameters("Account/OpretBruger", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
-
             </EditForm>
         </section>
     </div>
 </div>
 
+
 @code {
+    // Variabler
     private string? errorMessage;
 
     [CascadingParameter]
@@ -54,15 +61,17 @@
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
 
+    // Metode fra Blazor som køres EN gang når man kommer ind på siden
     protected override async Task OnInitializedAsync()
     {
         if (HttpMethods.IsGet(HttpContext.Request.Method))
         {
-            // Clear the existing external cookie to ensure a clean login process
+            // Log brugeren ud
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
         }
     }
-
+    
+    //Metode til log ind
     public async Task LoginUser()
     {
         var result = await SignInManager.PasswordSignInAsync(Input.Username, Input.Password, false, lockoutOnFailure: false);
@@ -72,6 +81,7 @@
         }
     }
 
+    //Privat klasse til at håndtere input data
     private sealed class InputModel
     {
         [Required]
