@@ -30,18 +30,18 @@
                 <hr />
                 <ValidationSummary class="text-danger" role="alert" />
                 <div class="form-floating mb-3">
-                    <InputText @bind-Value="Input.Username" autocomplete="username" aria-required="true" placeholder="Username" />
+                    <InputText @bind-Value="Input.Username" autocomplete="Brugernavn" aria-required="true" placeholder="Brugernavn" />
                     <ValidationMessage For="() => Input.Username" class="text-danger" />
                 </div>
                 <div class="form-floating mb-3">
-                    <InputText type="password" @bind-Value="Input.Password" autocomplete="current-password" aria-required="true" placeholder="password" />
+                    <InputText type="password" @bind-Value="Input.Password" autocomplete="Adgangskode" aria-required="true" placeholder="Adgangskode" />
                     <ValidationMessage For="() => Input.Password" class="text-danger" />
                 </div>
                 <div>
-                    <button type="submit" class="btn btn-lg btn-primary w-100">Log in</button>
+                    <button type="submit" class="btn btn-lg btn-primary w-100">Log ind</button>
                 </div>
                 @* Et link med parametre *@
-                <a href="@(NavigationManager.GetUriWithQueryParameters("Account/OpretBruger", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
+                <a href="@(NavigationManager.GetUriWithQueryParameters("Account/OpretBruger", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Opret bruger</a>
             </EditForm>
         </section>
     </div>
